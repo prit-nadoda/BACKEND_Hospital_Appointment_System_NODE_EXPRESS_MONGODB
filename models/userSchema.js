@@ -43,11 +43,11 @@ const userSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ["User", "Admin", "Doctor"],
+    enum: ["Petient", "Admin", "Doctor"],
     default: "User",
   },
   doctorDepartment: {
-    type: string,
+    type: String,
   },
   docAvatar: {
     public_id: String,
@@ -67,10 +67,9 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
 };
 
 userSchema.methods.generateAuthToken = function () {
-  const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET_KEY, {
+  return jwt.sign({ _id: this._id }, process.env.JWT_SECRET_KEY, {
     expiresIn: process.env.JWT_EXPIRES,
   });
-  return token;
 };
 
 export const User = mongoose.model("users", userSchema);

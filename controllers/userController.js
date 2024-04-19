@@ -1,8 +1,8 @@
-import catchAsyncError from "../middlewares/catchAsyncErrors.js";
+import { catchAsyncError } from "../middlewares/catchAsyncErrors.js";
 import ErrorHandler from "../middlewares/errorMiddleware.js";
-import User from "../models/userSchema.js";
+import { User } from "../models/userSchema.js";
 
-export const petientRegister = catchAsyncError(async () => {
+export const petientRegister = catchAsyncError(async (req, res, next) => {
   const {
     firstname,
     lastname,
