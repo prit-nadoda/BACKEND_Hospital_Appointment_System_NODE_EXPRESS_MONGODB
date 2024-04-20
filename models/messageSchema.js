@@ -18,7 +18,7 @@ const messageSchema = new mongoose.Schema({
     validate: [validator.isEmail, "Please provide a valid Email!"],
   },
   number: {
-    type: String,
+    type: Number,
     required: [true, "Number is required!"],
     minlength: [10, "Number must consist exactly 10 characters!"],
     maxlength: [10, "Number must consist exactly 10 characters!"],
