@@ -55,22 +55,24 @@ export const patientRegister = catchAsyncError(async (req, res, next) => {
 });
 
 export const login = catchAsyncError(async (req, res, next) => {
-  const { email, password, conformPassword } = req.body;
-  if (!email || !password || !conformPassword) {
+  const { email, password, conformPassword, type } = req.body;
+  if (!email || !password || !conformPassword || !type) {
     return next(new ErrorHandler("Please provide full information!!", 400));
+  }
+  if (!conformPassword === password) {
+    return next(new ErrorHandler("Passwords do not macth!", 400));
   }
   const user = await User.findOne({ email }).select("+password");
   if (!user) {
-    return next(new ErrorHandler("Invalid email or password", 400));
+    return next(new ErrorHandler("Invalid email or password!", 400));
   }
-  const isPasswordMatched = await user.conformPassword(password);
+  const isPasswordMatched = await user.comparePassword(password);
   if (!isPasswordMatched) {
-    return next(new ErrorHandler("Passwords do not macth!", 400));
+    return next(new ErrorHandler("Invalid email or password!", 400));
   }
-  if (role !== user.role) {
-    return next(
-      new ErrorHandler("You are not authorized to access this resource", 400)
-    );
+
+  if (type !== user.type) {
+    return next(new ErrorHandler("You are not authorized for this Role", 400));
   }
   generateToken(user, "You are logged in successfully!", 200, res);
 });
