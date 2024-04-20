@@ -43,7 +43,7 @@ const userSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ["Petient", "Admin", "Doctor"],
+    enum: ["Patient", "Admin", "Doctor"],
     default: "User",
   },
   doctorDepartment: {
