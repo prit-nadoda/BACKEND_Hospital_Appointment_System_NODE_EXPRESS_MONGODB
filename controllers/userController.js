@@ -127,3 +127,36 @@ export const getAllDoctors = catchAsyncError(async (req, res, next) => {
     doctors,
   });
 });
+
+export const getUserInfo = catchAsyncError((req, res, next) => {
+  const user = req.user;
+  res.status(200).json({
+    success: true,
+    user,
+  });
+});
+
+export const logoutAdmin = catchAsyncError((req, res, next) => {
+  res
+    .status(200)
+    .cookie("adminToken", "", {
+      expires: new Date(Date.now()),
+      httpOnly: true,
+    })
+    .json({
+      success: true,
+      message: "Admin logged out successfully!",
+    });
+});
+export const logoutPatient = catchAsyncError((req, res, next) => {
+  res
+    .status(200)
+    .cookie("patientToken", "", {
+      expires: new Date(Date.now()),
+      httpOnly: true,
+    })
+    .json({
+      success: true,
+      message: "Patient logged out successfully!",
+    });
+});
