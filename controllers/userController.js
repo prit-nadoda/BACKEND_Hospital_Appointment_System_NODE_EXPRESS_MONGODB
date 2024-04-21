@@ -119,3 +119,11 @@ export const addNewAdmin = catchAsyncError(async (req, res, next) => {
         .status(400)
         .json({ success: false, message: "Failed to add new Admin!" });
 });
+
+export const getAllDoctors = catchAsyncError(async (req, res, next) => {
+  const doctors = await User.find({ type: "Doctor" });
+  res.status(200).json({
+    success: true,
+    doctors,
+  });
+});
