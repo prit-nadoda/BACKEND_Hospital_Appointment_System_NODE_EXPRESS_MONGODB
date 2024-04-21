@@ -76,3 +76,46 @@ export const login = catchAsyncError(async (req, res, next) => {
   }
   generateToken(user, "You are logged in successfully!", 200, res);
 });
+
+export const addNewAdmin = catchAsyncError(async (req, res, next) => {
+  const { firstname, lastname, email, number, age, gender, password } =
+    req.body;
+  if (
+    !firstname ||
+    !lastname ||
+    !email ||
+    !number ||
+    !age ||
+    !gender ||
+    !password
+  ) {
+    return next(new ErrorHandler("Please provide full information!", 400));
+  }
+  const isAlreadyExist = await User.findOne({ email });
+  if (isAlreadyExist) {
+    return next(
+      new ErrorHandler(
+        `${isAlreadyExist.type} with this email already registered!`,
+        400
+      )
+    );
+  }
+
+  const Admin = await User.create({
+    firstname: firstname,
+    lastname: lastname,
+    email: email,
+    number: number,
+    age: age,
+    gender: gender,
+    password: password,
+    type: "Admin",
+  });
+  Admin
+    ? res
+        .status(200)
+        .json({ success: true, message: "Admin Added Successfully!" })
+    : res
+        .status(400)
+        .json({ success: false, message: "Failed to add new Admin!" });
+});
