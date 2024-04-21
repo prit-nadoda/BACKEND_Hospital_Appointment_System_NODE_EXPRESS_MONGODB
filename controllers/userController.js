@@ -2,6 +2,7 @@ import { catchAsyncError } from "../middlewares/catchAsyncErrors.js";
 import ErrorHandler from "../middlewares/errorMiddleware.js";
 import { User } from "../models/userSchema.js";
 import { generateToken } from "../utils/jwkToken.js";
+import cloudinary from "cloudinary";
 
 export const patientRegister = catchAsyncError(async (req, res, next) => {
   const {
@@ -159,4 +160,79 @@ export const logoutPatient = catchAsyncError((req, res, next) => {
       success: true,
       message: "Patient logged out successfully!",
     });
+});
+
+export const addNewDoctor = catchAsyncError(async (req, res, next) => {
+  if (!req.files || Object.keys(req.files) === 0) {
+    return next(new ErrorHandler("Doctor Avatar is missig!", 400));
+  }
+  const { docAvatar } = req.files;
+  const allowedFormats = ["image/jpg", "image/jpeg", "image/webp", "image/png"];
+  if (!allowedFormats.includes(docAvatar.mimetype)) {
+    return next(new ErrorHandler("This file format is not supported!", 400));
+  }
+  const {
+    firstname,
+    lastname,
+    email,
+    number,
+    age,
+    gender,
+    password,
+    doctorDepartment,
+  } = req.body;
+  if (
+    !firstname ||
+    !lastname ||
+    !email ||
+    !number ||
+    !age ||
+    !gender ||
+    !password ||
+    !doctorDepartment
+  ) {
+    return next(new ErrorHandler("Please provide full information!", 400));
+  }
+  const isAlreadyExist = await User.findOne({ email });
+  if (isAlreadyExist) {
+    return next(
+      new ErrorHandler(
+        `${isAlreadyExist.type} is already registrated with given Email!`,
+        400
+      )
+    );
+  }
+
+  const cloudinaryResponse = await cloudinary.uploader.upload(
+    docAvatar.tempFilePath
+  );
+  if (!cloudinaryResponse || cloudinaryResponse.error) {
+    console.log(
+      `Cloudinary Error : ${
+        cloudinaryResponse.error.message || "Unknown Cloudinary Error"
+      }`
+    );
+  }
+  const doctor = await User.create({
+    firstname: firstname,
+    lastname: lastname,
+    email: email,
+    number: number,
+    age: age,
+    gender: gender,
+    password: password,
+    type: "Doctor",
+    doctorDepartment: doctorDepartment,
+    docAvatar: {
+      public_id: cloudinaryResponse.public_id,
+      url: cloudinaryResponse.secure_url,
+    },
+  });
+  doctor
+    ? res
+        .status(200)
+        .json({ success: true, message: "Doctor Added Successfully!", doctor })
+    : res
+        .status(400)
+        .json({ success: false, message: "Something Went wrong!" });
 });
