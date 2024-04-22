@@ -95,3 +95,11 @@ export const makeApoointment = catchAsyncError(async (req, res, next) => {
     message: "Appointment sent successfully!",
   });
 });
+
+export const getAllAppointments = catchAsyncError(async (req, res, next) => {
+  const appointments = await Appointment.find();
+  res.status(200).json({
+    success: true,
+    appointments,
+  });
+});
