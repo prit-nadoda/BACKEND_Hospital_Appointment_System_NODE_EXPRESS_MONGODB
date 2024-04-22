@@ -5,17 +5,6 @@ class ErrorHandler extends Error {
   }
 }
 
-export const checkApiKey = (req, res, next) => {
-  const apiKey = req.headers["x-api-key"];
-  if (!apiKey || apiKey !== process.env.CLOUDINARY_API - KEY) {
-    return res.status(401).json({
-      success: false,
-      message: "Unauthorized: Missing or invalid API key",
-    });
-  }
-  next();
-};
-
 export const errorMiddleware = (err, req, res, next) => {
   err.message = err.message || "Internal Server Error";
   err.statusCode = err.statusCode || 500;
