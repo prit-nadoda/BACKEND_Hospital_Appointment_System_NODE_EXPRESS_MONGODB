@@ -90,6 +90,7 @@ export const makeApoointment = catchAsyncError(async (req, res, next) => {
     doctorID,
     patientID,
   });
+
   res.status(200).json({
     success: true,
     message: "Appointment sent successfully!",
@@ -107,7 +108,7 @@ export const getAllAppointments = catchAsyncError(async (req, res, next) => {
 export const updateAppointmentStatus = catchAsyncError(
   async (req, res, next) => {
     const { id } = req.params;
-    console.log(id);
+
     const appointment = await Appointment.findById(id);
     if (!appointment) {
       return next(new ErrorHandler("Appointment not found!", 400));
@@ -135,6 +136,41 @@ export const deleteAppointment = catchAsyncError(async (req, res, next) => {
   if (!appointment) {
     return next(new ErrorHandler("Appointment not found!", 400));
   }
+  await appointment.deleteOne();
+  res.status(200).json({
+    success: true,
+    message: "Appointment deleted successfully!",
+  });
+});
+
+export const GetMyAppointments = catchAsyncError(async (req, res, next) => {
+  const appointments = await Appointment.find({
+    patientID: req.user._id,
+  });
+
+  appointments && appointments.length > 0
+    ? res.status(200).json({
+        success: true,
+        appointments,
+      })
+    : res.status(200).json({
+        success: true,
+        message: "No appointments found!",
+      });
+});
+
+export const deleteMyAppointment = catchAsyncError(async (req, res, next) => {
+  const { id } = req.params;
+
+  const appointment = await Appointment.findById({
+    _id: id,
+    patientID: req.user._sid,
+  });
+
+  if (!appointment) {
+    return next(new ErrorHandler("Appointment not found!", 404));
+  }
+
   await appointment.deleteOne();
   res.status(200).json({
     success: true,

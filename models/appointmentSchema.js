@@ -18,7 +18,7 @@ const appointmentSchema = new mongoose.Schema({
     validate: [validator.isEmail, "Please provide a valid Email!"],
   },
   number: {
-    type: Number,
+    type: String,
     required: [true, "Number is required!"],
     minlength: [10, "Number must consist exactly 10 characters!"],
     maxlength: [10, "Number must consist exactly 10 characters!"],
@@ -58,7 +58,7 @@ const appointmentSchema = new mongoose.Schema({
   },
   doctorID: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Doctor",
+    ref: "users",
     required: [true, "Doctor is required!"],
   },
   hasVisited: {
@@ -70,9 +70,9 @@ const appointmentSchema = new mongoose.Schema({
     enum: ["Pending", "Confirmed", "Cancelled"],
     default: "Pending",
   },
-  petientID: {
+  patientID: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Patient",
+    ref: "users",
   },
 });
 
